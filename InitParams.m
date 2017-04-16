@@ -1,6 +1,4 @@
-function [W1,W2,b1,b2] = InitParams(d)
-K=10;
-m=50;
+function [W1,W2,b1,b2] = InitParams(d,m,K)
 mean=0;
 std=0.001;
 %mean 0 standard variation 0.01

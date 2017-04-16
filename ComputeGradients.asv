@@ -1,0 +1,31 @@
+function [LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(X, Y, P, W1, W2, h, s1, lambda)
+n=size(X,2);
+Lb1=0;
+Lb2=0;
+LW1=0;
+LW2=0;
+for i=1:n
+    %individuales
+    Pi=P(:,i);
+    Yt=(Y(:,i))';
+    Xt=(X(:,i))';
+ 
+    %ops
+    g=-Yt/(Yt*Pi) * (diag(Pi)-Pi*(Pi)');
+    Lb2=Lb2+g';
+    LW2=LW2+((g')*h');
+    g=g*W2;
+    g=g*diag(Ind(s1>0));
+    Lb1=Lb1+g';
+    LW1=LW1+((g')*Xt');
+end
+LW1=LW1/n;
+LW2=LW2/n;
+Lb1=Lb1/n;
+Lb2=Lb2/n;
+%For regularization
+JW1=LW1+2*lambda*W1;
+JW2=LW2+2*lambda*W2;
+Jb1=Lb
+
+end
