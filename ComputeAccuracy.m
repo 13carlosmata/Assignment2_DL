@@ -1,5 +1,5 @@
 function acc = ComputeAccuracy(X, Y, P)
-suma = 0
+suma = 0;
 for i=1:size(X,2)
     [value,index] = max(P(:,i));
     if Y(index,i) == 1

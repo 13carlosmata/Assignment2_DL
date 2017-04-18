@@ -20,8 +20,8 @@ valX = valX - repmat(mean_trainX, [1, size(valX, 2)]);
 testX = testX - repmat(mean_trainX, [1, size(testX, 2)]);
 fprintf('Substractions done "----->check<-------" \n');
 %% Initiating W1, W2, b1 and b2
-m=50; K-10 
-[W1,W2,b1,b2] = InitParams(d,m);
+m=50; K=10;
+[W1,W2,b1,b2] = InitParams(d,m,K);
 fprintf('Initialization done \n');
 
 % -------> Termina Ex1
@@ -38,6 +38,18 @@ fprintf(' cost done \n');
 acc = ComputeAccuracy(trainX,trainY,P);
 fprintf(' accuracy done \n');
 %% Gradients
-[LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(trainX, trainY, P, cell2mat(W1), cell2mat(W2), h, s1, lambda)
+[LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(trainX, trainY, P, cell2mat(W1), cell2mat(W2), h, s1, lambda);
 fprintf(' gradients done \n');
+
+%% Evaluation of gradients
+h = 1e-15;
+[grad_b, grad_W] = ComputeGradsNum(trainX(:,1), trainY(:,1), cell2mat(W1), cell2mat(b1), lambda, h)
+
+
+
+
+
+
+
+
 
