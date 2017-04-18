@@ -15,7 +15,7 @@ for i=1:n
     Lb2=Lb2+g';
     LW2=LW2+((g')*h');
     g=g*W2;
-    g=g*diag(s1>0);
+    g=g*diag(max(0,s1));
     Lb1=Lb1+g';
     LW1=LW1+((g')*Xt);
 end

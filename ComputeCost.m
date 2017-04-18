@@ -1,7 +1,8 @@
-function J = ComputeCost(P,Y,W1,W2,lambda)
+function [J,J1] = ComputeCost(X,Y,W1,W2,b1,b2,lambda)
 n=size(Y,2);
 lcross=0;
 tr1=(Y)';
+[P,h,s1] = EvaluateClassifier(X,W1,W2,b1,b2);
 for i=1:n
   lcross=-log(tr1(i,:)*P(:,i))+lcross;
 end
