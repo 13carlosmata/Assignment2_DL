@@ -5,7 +5,7 @@ addpath 'cifar-10-batches-mat';
 clear all;
 GD=GDparams;
 GD.n_batch=200;
-GD.n_epochs=40;
+GD.n_epochs=10;
 GD.eta=0.01;
 lambda=0;
 [trainX, trainY, trainy] = LoadBatch('data_batch_1');              %Data for training
