@@ -9,7 +9,6 @@ grad_b = cell(numel(b), 1);
 
 for j=1:length(b)
     grad_b{j} = zeros(size(b{j}));
-    
     for i=1:length(b{j})
         b_try = b;
         b_try{j}(i) = b_try{j}(i) + h;
@@ -25,7 +24,6 @@ for j=1:length(W)
         W_try = W;
         W_try{j}(i) = W_try{j}(i) + h;
         [c2, ~] = ComputeCost(X, Y, cell2mat(W_try),cell2mat(W2),cell2mat(b1),cell2mat(b2), lambda);
-        
         grad_W{j}(i) = (c2-c) / h;
     end
 end

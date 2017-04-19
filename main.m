@@ -7,7 +7,7 @@ GD=GDparams;
 GD.n_batch=200;
 GD.n_epochs=40;
 GD.eta=0.01;
-lambda=0.1;
+lambda=0;
 [trainX, trainY, trainy] = LoadBatch('data_batch_1');              %Data for training
 [valX, valY, valy] = LoadBatch('data_batch_2');                    %Data for validation
 [testX, testY, testy] = LoadBatch('test_batch.mat');               %For Testing
@@ -28,15 +28,15 @@ testX = testX - repmat(mean_trainX, [1, size(testX, 2)]);
 fprintf('Substractions done "----->check<-------" \n');
 %% Initiating W1, W2, b1 and b2
 m=50; K=10;
-[W1,W2,b1,b2] = InitParams(d,m,K);
+[W,b] = InitParams(d,m,K);
 fprintf('Initialization done \n');
 %     -------> Termina Ex1
 %%    -------> Beg of Ex2
-[P,h,s1] = EvaluateClassifier(trainX, cell2mat(W1), cell2mat(W2), cell2mat(b1), cell2mat(b2));
+[P,h,s1] = EvaluateClassifier(trainX, W, b);
 fprintf('Evaluations done P output \n');
 
 %%   This is for the cost function
-[J,J1] = ComputeCost(trainX,trainY,cell2mat(W1),cell2mat(W2),cell2mat(b1),cell2mat(b2),lambda);
+[J,J1] = ComputeCost(trainX,trainY,W,b,lambda);
 fprintf(' cost done \n');
 fprintf('Initial Loss = %d\n', J);
 
@@ -44,12 +44,12 @@ fprintf('Initial Loss = %d\n', J);
 acc = ComputeAccuracy(trainX,trainY,P);
 fprintf(' accuracy done \n');
 %% Gradients
-[LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(trainX, trainY, P, cell2mat(W1), cell2mat(W2), h, s1, lambda);
+[LW,Lb,JW,Jb] = ComputeGradients(trainX, trainY, P, W,b, h, s1, lambda);
 fprintf(' gradients done \n');
 
-% %% Evaluation of gradients
-% h = 1e-15;
-% [grad_b, grad_W] = ComputeGradsNum(trainX(:,4), trainY(:,4), W1,W2,b1,b2, lambda, h);
+%% Evaluation of gradients
+% h = 1e-5;
+% [grad_b, grad_W] = ComputeGradsNum(trainX(:,1), trainY(:,1), W1,W2,b1,b2, lambda, h);
 % fprintf(' ev gradients-numeric done \n');
 
 %% WOrking with minibatches   -- This one is using one part of the data
@@ -63,13 +63,13 @@ fprintf(' gradients done \n');
 % fprintf('Initial Loss = %d\n', J);
 
 %% Working with the full batch of data
-[W1star,W2star,b1star,b2star,JK] = MiniBatchGD(trainX, trainY, GD, cell2mat(W1),cell2mat(W2),cell2mat(b1),cell2mat(b2), lambda);
+[Wstar,bstar,JK] = MiniBatchGD(trainX, trainY, GD, W, b, lambda);
 fprintf(' minibatch done \n');
 figure
 plot(JK)
-[P,h,s1] = EvaluateClassifier(trainX, W1star, W2star, b1star, b2star);
-accN = ComputeAccuracy(trainX,trainY,P);
-fprintf('Acc= %d\n', accN);
+[P,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
+acc_New = ComputeAccuracy(trainX,trainY,P);
+fprintf('Acc_New= %d\n', acc_New);
 
 
 

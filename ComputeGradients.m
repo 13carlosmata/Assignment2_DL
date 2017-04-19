@@ -1,9 +1,11 @@
-function [LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(X, Y, P, W1, W2, h, s1, lambda)
+function [LW,Lb,JW,Jb] = ComputeGradients(X, Y, P, W, b, h, s1, lambda)
 n=size(X,2);
-Lb1=0;
-Lb2=0;
-LW1=0;
-LW2=0;
+LW{1}=zeros(size(W{1}));
+LW{2}=zeros(size(W{2}));
+Lb{1}=zeros(size(b{1}));
+Lb{2}=zeros(size(b{2}));
+
+
 for i=1:n
     %individuales
     Pi=P(:,i);
@@ -12,20 +14,20 @@ for i=1:n
  
     %ops
     g=-Yt/(Yt*Pi) * (diag(Pi)-Pi*(Pi)');
-    Lb2=Lb2+g';
-    LW2=LW2+((g')*h');
-    g=g*W2;
-    g=g*diag(max(0,s1));
-    Lb1=Lb1+g';
-    LW1=LW1+((g')*Xt);
+    Lb{2}=Lb{2}+g';
+    LW{2}=LW{2}+((g')*h(:,i)');
+    g=g*W{2};
+    g=g*diag(h(:,1));
+    Lb{1}=Lb{1}+g';
+    LW{1}=LW{1}+((g')*Xt);
 end
-LW1=LW1/n;
-LW2=LW2/n;
-Lb1=Lb1/n;
-Lb2=Lb2/n;
+LW{1}=LW{1}/n;
+LW{2}=LW{2}/n;
+Lb{1}=Lb{1}/n;
+Lb{2}=Lb{2}/n;
 %For regularization
-JW1=LW1+2*lambda*W1;
-JW2=LW2+2*lambda*W2;
-Jb1=Lb1;
-Jb2=Lb2;
+JW{1}=LW{1}+2*lambda*W{1};
+JW{2}=LW{2}+2*lambda*W{2};
+Jb{1}=Lb{1};
+Jb{2}=Lb{2};
 end
