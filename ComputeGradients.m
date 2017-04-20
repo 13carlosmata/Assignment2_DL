@@ -17,7 +17,8 @@ for i=1:n
     Lb{2}=Lb{2}+g';
     LW{2}=LW{2}+((g')*h(:,i)');
     g=g*W{2};
-    g=g*diag(h(:,i));
+    g=g*diag(s1(:,i)>0);
+    
     Lb{1}=Lb{1}+g';
     LW{1}=LW{1}+((g')*Xt);
 end

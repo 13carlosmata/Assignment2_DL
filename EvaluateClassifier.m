@@ -11,4 +11,5 @@ for i=1:n
     P1=softmax(s);
     P=[P,P1];
     h=[h,H];
+    s1=[s1,S1];
 end

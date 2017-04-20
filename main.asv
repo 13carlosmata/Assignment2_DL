@@ -2,12 +2,12 @@ close all
 clear all
 addpath 'cifar-10-batches-mat';
 %% Reading data and initialize the parameters of the network
-clear all;
 GD=GDparams;
 GD.n_batch=200;
-GD.n_epochs=40;
+GD.n_epochs=5;
 GD.eta=0.01;
-lambda=0;
+lambda=0.000001;
+%%
 [trainX, trainY, trainy] = LoadBatch('data_batch_1');              %Data for training
 [valX, valY, valy] = LoadBatch('data_batch_2');                    %Data for validation
 [testX, testY, testy] = LoadBatch('test_batch.mat');               %For Testing
@@ -25,18 +25,18 @@ fprintf('Preprocessing done \n');
 %Subtraction from validated and tested data
 valX = valX - repmat(mean_trainX, [1, size(valX, 2)]);
 testX = testX - repmat(mean_trainX, [1, size(testX, 2)]);
-fprintf('Substractions done "----->check<-------" \n');
+fprintf('Substractions done\n');
 %% Initiating W1, W2, b1 and b2
 m=50; K=10;
-[W1,W2,b1,b2] = InitParams(d,m,K);
+[W,b] = InitParams(d,m,K);
 fprintf('Initialization done \n');
 %     -------> Termina Ex1
 %%    -------> Beg of Ex2
-[P,h,s1] = EvaluateClassifier(trainX, cell2mat(W1), cell2mat(W2), cell2mat(b1), cell2mat(b2));
+[P,h,s1] = EvaluateClassifier(trainX, W, b);
 fprintf('Evaluations done P output \n');
 
 %%   This is for the cost function
-[J,J1] = ComputeCost(trainX,trainY,cell2mat(W1),cell2mat(W2),cell2mat(b1),cell2mat(b2),lambda);
+[J,J1] = ComputeCost(trainX,trainY,W,b,lambda);
 fprintf(' cost done \n');
 fprintf('Initial Loss = %d\n', J);
 
@@ -44,12 +44,16 @@ fprintf('Initial Loss = %d\n', J);
 acc = ComputeAccuracy(trainX,trainY,P);
 fprintf(' accuracy done \n');
 %% Gradients
-[LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(trainX, trainY, P, cell2mat(W1), cell2mat(W2), h, s1, lambda);
+[LW,Lb,JW,Jb] = ComputeGradients(trainX, trainY, P, W,b, h, s1, lambda);
 fprintf(' gradients done \n');
 
 %% Evaluation of gradients
+% 
+% [LW,Lb,JW,Jb] = ComputeGradients(trainX(:,1), trainY(:,1), P, W,b, h, s1, lambda);
+% fprintf(' g1 done \n');
+% 
 % h = 1e-5;
-% [grad_b, grad_W] = ComputeGradsNum(trainX(:,1), trainY(:,1), W1,W2,b1,b2, lambda, h);
+% [grad_b, grad_W] = ComputeGradsNum(trainX(:,1), trainY(:,1), W,b, lambda, h);
 % fprintf(' ev gradients-numeric done \n');
 
 %% WOrking with minibatches   -- This one is using one part of the data
@@ -63,14 +67,45 @@ fprintf(' gradients done \n');
 % fprintf('Initial Loss = %d\n', J);
 
 %% Working with the full batch of data
-[W1star,W2star,b1star,b2star,JK] = MiniBatchGD(trainX, trainY, GD, cell2mat(W1),cell2mat(W2),cell2mat(b1),cell2mat(b2), lambda);
+[Wstar,bstar,JK] = MiniBatchGD(trainX, trainY, GD, W, b, lambda);
 fprintf(' minibatch done \n');
 figure
 plot(JK)
-[P,h,s1] = EvaluateClassifier(trainX, W1star, W2star, b1star, b2star);
-accN = ComputeAccuracy(trainX,trainY,P);
-fprintf('Acc= %d\n', accN);
+[P,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
+acc_New = ComputeAccuracy(trainX,trainY,P);
+fprintf('Acc_New= %d\n', acc_New);
+title(num2str(GD.n_batch),num2str(GD.n_epochs),num2str(GD.eta),num2str(lambda));
+%% FOr Validation Data
+
+% [P_val,h_val,s1_val] = EvaluateClassifier(valX, W, b);
+% [J_val,J1_val] = ComputeCost(valX,valY,W,b,lambda);
+% acc_val = ComputeAccuracy(valX,valY,P_val);
+% [LW_val,Lb_val,JW_val,Jb_val] = ComputeGradients(valX, valY, P_val, W,b, h_val, s1_val, lambda);
+% [Wstar_val,bstar_val,JK_val] = MiniBatchGD(valX, valY, GD, W, b, lambda);
+% figure
+% % plot(JK_val)
+% [P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar_val, bstar_val);
+% acc_New_val = ComputeAccuracy(valX,valY,P_val);
+% fprintf('Acc_New= %d\n', acc_New_val);
+% plot(1:GD.n_epochs,JK,'r',1:GD.n_epochs,JK_val,'b');
+% legend('train','validated');
 
 
-
-
+%%
+% Breteando bien, 82% y decreciendo de lo mas bien
+% GD=GDparams;
+% GD.n_batch=100;
+% GD.n_epochs=200;
+% GD.eta=0.1;
+% lambda=0;
+% 
+%  using small amount of data: acc16%
+% GD=GDparams;
+% GD.n_batch=100;
+% GD.n_epochs=200;
+% GD.eta=0.01;
+% lambda=0;
+%  quitando las lineas de momentum
+% 
+% 
+% 

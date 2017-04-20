@@ -23,8 +23,8 @@ for i=1:GD.n_epochs
         [LW,Lb,JW,Jb] = ComputeGradients(Xbatch, Ybatch, P, W,b, h, s1, lambda);
 
 %         [LW1,LW2,Lb1,Lb2,JW1,JW2,Jb1,Jb2] = ComputeGradients(Xbatch,Ybatch, P, W1, W2, h, s1, lambda);
-        W{1} = W{1} - GD.eta*LW{1}; b{1} = b{1} - GD.eta*Lb{1};
-        W{2} = W{2} - GD.eta*LW{2}; b{2} = b{2} - GD.eta*Lb{2};
+        W{1} = W{1} - GD.eta*JW{1}; b{1} = b{1} - GD.eta*Lb{1};
+        W{2} = W{2} - GD.eta*JW{2}; b{2} = b{2} - GD.eta*Lb{2};
         
         %Adding the momentum
         
