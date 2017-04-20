@@ -6,9 +6,9 @@ fprintf('   --> Running Code \n');
 fprintf('GD parameters '); 
 GD=GDparams;
 GD.n_batch=100;
-GD.n_epochs=40;
-GD.eta=0.04;
-lambda=0.00001;
+GD.n_epochs=10;
+GD.eta=0.01;
+lambda=0.1;
 fprintf('- done\n'); 
 %%
 fprintf('Loading Batch '); 
@@ -81,7 +81,7 @@ tic
 toc
 fprintf('- done \n');
 figure
-plot(JK)
+plot(0:GD.n_epochs,JK)
 [Pn,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
 acc_New = ComputeAccuracy(trainX,trainY,Pn);
 fprintf('    > New Accuracy = %d\n', acc_New);
@@ -93,6 +93,8 @@ fprintf('Computing for Validated Data ');
 % acc_val = ComputeAccuracy(valX,valY,P_val);
 %[LW_val,Lb_val,JW_val,Jb_val] = ComputeGradients(valX, valY, P, W,b, h, s1, lambda);
 [Wstar_val,bstar_val,JK_val] = MiniBatchGD(valX, valY, GD, W, b, lambda);
+figure
+plot(0:GD.n_epochs,JK_val)
 fprintf('- done\n');
 figure
 [P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar, bstar);

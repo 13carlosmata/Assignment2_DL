@@ -6,9 +6,9 @@ fprintf('   --> Running Code \n');
 fprintf('GD parameters '); 
 GD=GDparams;
 GD.n_batch=100;
-GD.n_epochs=40;
-GD.eta=0.035;
-lambda=0.000001;
+GD.n_epochs=10;
+GD.eta=0.01;
+lambda=70;
 fprintf('- done\n'); 
 %%
 fprintf('Loading Batch '); 
@@ -81,7 +81,7 @@ tic
 toc
 fprintf('- done \n');
 figure
-plot(JK)
+plot(0:GD.n_epochs,JK)
 [Pn,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
 acc_New = ComputeAccuracy(trainX,trainY,Pn);
 fprintf('    > New Accuracy = %d\n', acc_New);
