@@ -1,5 +1,5 @@
-close all
-clear all
+% close all
+% clear all
 addpath 'cifar-10-batches-mat';
 %% Reading data and initialize the parameters of the network
 fprintf('   --> Running Code \n'); 
@@ -7,8 +7,8 @@ fprintf('GD parameters ');
 GD=GDparams;
 GD.n_batch=100;
 GD.n_epochs=40;
-GD.eta=0.03;
-lambda=0.000001;
+GD.eta=0.04;
+lambda=0.00001;
 fprintf('- done\n'); 
 %%
 fprintf('Loading Batch '); 
@@ -55,12 +55,13 @@ fprintf('Computing Gradients ');
 fprintf('- done \n');
 
 %% Evaluation of gradients
-% 
+
 % [LW,Lb,JW,Jb] = ComputeGradients(trainX(:,1), trainY(:,1), P, W,b, h, s1, lambda);
-% fprintf(' g1 done \n');
+% fprintf('    *Analitical calculated \n');
 % 
 % h = 1e-5;
 % [grad_b, grad_W] = ComputeGradsNum(trainX(:,1), trainY(:,1), W,b, lambda, h);
+% fprintf('    *Numerical calculated \n');
 % fprintf('Numerical-Analitical comparison done\n');
 
 %% WOrking with minibatches   -- This one is using one part of the data
@@ -75,28 +76,32 @@ fprintf('- done \n');
 
 %% Working with the full batch of data
 fprintf('Using MiniBatch ');
+tic
 [Wstar,bstar,JK] = MiniBatchGD(trainX, trainY, GD, W, b, lambda);
+toc
 fprintf('- done \n');
-% figure
-% plot(JK)
-[P,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
-acc_New = ComputeAccuracy(trainX,trainY,P);
+figure
+plot(JK)
+[Pn,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
+acc_New = ComputeAccuracy(trainX,trainY,Pn);
 fprintf('    > New Accuracy = %d\n', acc_New);
 title(strcat('n batch: ',num2str(GD.n_batch),' epochs: ',num2str(GD.n_epochs),' eta: ',num2str(GD.eta),' lambda: ',num2str(lambda)));
 %% For Validation Data
 fprintf('Computing for Validated Data ');
-[P_val,h_val,s1_val] = EvaluateClassifier(valX, W, b);
-[J_val,J1_val] = ComputeCost(valX,valY,W,b,lambda);
-acc_val = ComputeAccuracy(valX,valY,P_val);
-[LW_val,Lb_val,JW_val,Jb_val] = ComputeGradients(valX, valY, P_val, W,b, h_val, s1_val, lambda);
+% [P_val,h_val,s1_val] = EvaluateClassifier(valX, W, b);
+% [J_val,J1_val] = ComputeCost(valX,valY,W,b,lambda);
+% acc_val = ComputeAccuracy(valX,valY,P_val);
+%[LW_val,Lb_val,JW_val,Jb_val] = ComputeGradients(valX, valY, P, W,b, h, s1, lambda);
 [Wstar_val,bstar_val,JK_val] = MiniBatchGD(valX, valY, GD, W, b, lambda);
 fprintf('- done\n');
 figure
-[P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar_val, bstar_val);
+[P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar, bstar);
 acc_New_val = ComputeAccuracy(valX,valY,P_val);
 fprintf('Accuracy for Validated Data= %d\n', acc_New_val);
-plot(1:GD.n_epochs,JK,'r',1:GD.n_epochs,JK_val,'b');
+%%
+plot(0:GD.n_epochs,JK,'r',0:GD.n_epochs,JK_val,'b');
 legend('training loss','validation loss');
+title(strcat('n batch: ',num2str(GD.n_batch),' epochs: ',num2str(GD.n_epochs),' eta: ',num2str(GD.eta),' lambda: ',num2str(lambda)));
 
 
 %%
@@ -116,4 +121,5 @@ legend('training loss','validation loss');
 %  quitando las lineas de momentum
 % 
 % 
-% 
+% [P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar, bstar);
+
