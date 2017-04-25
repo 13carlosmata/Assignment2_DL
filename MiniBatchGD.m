@@ -6,7 +6,7 @@ decay_rate=0.95;
 v_W{1}=zeros(size(W{1})); v_W{2}=zeros(size(W{2}));
 v_b{1}=zeros(size(b{1})); v_b{2}=zeros(size(b{2}));
 wb = waitbar(0,'1','Name','Minibatch progress');
-rho=[0.5,0.9,0.99];
+rho=0.9;
 et=GD.eta;
 for i=1:GD.n_epochs
 %      fprintf('i = %d\n', i);
@@ -25,10 +25,10 @@ for i=1:GD.n_epochs
         W{1} = W{1} - et*JW{1}; b{1} = b{1} - et*Lb{1};
         W{2} = W{2} - et*JW{2}; b{2} = b{2} - et*Lb{2};
         %Adding the momentum
-        v_W{1}=0.9*v_W{1}+et*JW{1};
-        v_W{2}=0.9*v_W{2}+et*JW{2};
-        v_b{1}=0.9*v_b{1}+et*Jb{1};
-        v_b{2}=0.9*v_b{2}+et*Jb{2};
+        v_W{1}=rho*v_W{1}+et*JW{1};
+        v_W{2}=rho*v_W{2}+et*JW{2};
+        v_b{1}=rho*v_b{1}+et*Jb{1};
+        v_b{2}=rho*v_b{2}+et*Jb{2};
         W{1}=W{1}-v_W{1};
         W{2}=W{2}-v_W{2};
         b{1}=b{1}-v_b{1};
@@ -41,7 +41,7 @@ for i=1:GD.n_epochs
     [J,J1] = ComputeCost(X,Y,W,b,lambda);
     JK = [JK;J];
     W1star=W{1}; b1star=b{1}; W2star=W{2}; b2star=b{2};
-    et=et*decay_rate;
+     et=et*decay_rate;
 end
 Wstar={W1star,W2star};
 bstar={b1star,b2star};
