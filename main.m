@@ -1,17 +1,15 @@
 addpath 'cifar-10-batches-mat';
 clear all;
-close all;
-
+% close all;
 %% Reading data and initialize the parameters of the network
-
 %Best fit should be is at eta0.0385 and lambda 0.000001
 fprintf('   --> Running Code \n'); 
 fprintf('GD parameters '); 
 GD=GDparams;
 GD.n_batch=100;
-GD.n_epochs=30;
-GD.eta=0.0385;
-lambda=0.000001;            fprintf('- done\n'); 
+GD.n_epochs=10;
+GD.eta=0.035;
+lambda=1e-5;            fprintf('- done\n'); 
 %%  Loading Batches from CIFAR
 fprintf('Loading Batch '); 
 %           --Using 1 file--   Start
@@ -41,13 +39,13 @@ trainX = reshape(trainX,3072,10000);    %trainX with size dxn  -> 3072x10000
 % trainX=[trainX1,trainX3,trainX4,trainX5];
 % trainY=[trainY1,trainY3,trainY4,trainY5];
 %           --Using 5 files--   End
-
-valX = reshape(valX,3072,10000);        %valX swith size dxn  -> 3072x10000
-testX = reshape(testX,3072,10000);      %testX with size dxn  -> 3072x10000
+size(valX)
+valX = reshape(valX,3072,size(valX,4));        %valX swith size dxn  -> 3072x10000
+testX = reshape(testX,3072,size(testX,4));      %testX with size dxn  -> 3072x10000
 d=size(trainX,1); 
 
 
-%More prepocessing
+
 mean_trainX = mean(trainX, 2);
 trainX = trainX - repmat(mean_trainX, [1, size(trainX, 2)]);
 fprintf('- done\n');      fprintf('Running substractions with mean_X '); 
@@ -104,67 +102,72 @@ fprintf('Computing Gradients ');
 
 %% Working with the full batch of data
 fprintf('Using MiniBatch ');
-[Wstar,bstar,JK] = MiniBatchGD(trainX, trainY, GD, W, b, lambda);   fprintf('- done \n');
+tic
+[Wstar,bstar,JK,JK_val] = MiniBatchGD(trainX, trainY, GD, W, b, lambda , valX,valY);   fprintf('- done \n');
 %figure; plot(0:GD.n_epochs,JK);
+toc
 [Pn,h,s1] = EvaluateClassifier(trainX, Wstar, bstar);
 acc_New = ComputeAccuracy(trainX,trainY,Pn);
 fprintf(strcat('      > New Accuracy = ', ' ', num2str(acc_New),'%%\n'))
-%fprintf('    > New Accuracy = %d\n', acc_New);
 %title(strcat('n batch: ',num2str(GD.n_batch),' epochs: ',num2str(GD.n_epochs),' eta: ',num2str(GD.eta),' lambda: ',num2str(lambda)));
 %% For Validation Data
 fprintf('Computing for Validated Data ');
-[Wstar_val,bstar_val,JK_val] = MiniBatchGD(valX, valY, GD, W, b, lambda);
-%figure; plot(0:GD.n_epochs,JK_val);
-fprintf('- done\n');
-figure
 [P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar, bstar);
 acc_New_val = ComputeAccuracy(valX,valY,P_val);
 fprintf(strcat('      > Accuracy for Validated Data = ', ' ', num2str(acc_New_val),'%%\n'))
+
+[P_test,h_test,s1_test] = EvaluateClassifier(testX, Wstar, bstar);
+acc_New_test = ComputeAccuracy(testX,testY,P_test);
+fprintf(strcat('      > Accuracy for Testing Data = ', ' ', num2str(acc_New_test),'%%\n'))
+
+
 %%
+x = figure;
 plot(0:GD.n_epochs,JK,'r',0:GD.n_epochs,JK_val,'b');
-legend(['training loss','     ',num2str(acc_New),'%'],...
-    ['validation loss','   ',num2str(acc_New_val),'%']);
+legend('training loss','validation loss');
 title(strcat('Parameters used: ', ' n.batch: ',num2str(GD.n_batch),' epochs: ',num2str(GD.n_epochs),' eta: ',num2str(GD.eta),' lambda: ',num2str(lambda)), 'FontSize',15);
+xlabel (['Acc for Val data:',num2str(acc_New_val)]);
+
 % 
 %%
-% [P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar, bstar);
-load 'etas';
-load 'lambdas';
-
-figure
-x = [0:10];
-subplot(1,2,1)
-
-
-plot(x,lambda0_0000001,x,lambda0_000001,x,lambda0_00001,x,lambda0_0001,x,lambda0_001,x,lambda0_01,x,lambda0_1,x,lambda0,x,lambda1,'LineWidth', 1.5)
-legend(['lambda = 1e-7'],...
-    ['lambda = 1e-6'],...
-    ['lambda = 1e-5'],...
-    ['lambda = 1e-4'],...
-    ['lambda = 1e-3'],...
-    ['lambda = 1e-2'],...
-    ['lambda = 1e-1'],...
-    ['lambda = 0'],...
-    ['lambda = 1e+0'])
-title('Loss Function at different values of lambda (eta=0.0385)','FontSize',20)
-axis([0 10 1 2.5])
-
-subplot(1,2,2)
-plot(x,eta0_01,x,eta0_015,x,eta0_03,x,eta0_0385,x,eta0_05,x,eta0_09,x,eta0_1,x,eta0_2,x,eta0,'LineWidth', 1.5)
-legend(['eta = 0.01'],...
-    ['eta = 0.015'],...
-    ['eta = 0.03'],...
-    ['eta = 0.0385'],...
-    ['eta = 0.05'],...
-    ['eta = 0.09'],...
-    ['eta = 0.1'],...
-    ['eta = 0.2'],...
-    ['eta = 0'])
-title('Loss Function at different values of eta (lambda=1e-6)','FontSize',20)
-axis([0 10 1 2.5])
-
-fprintf('--> Code ran successfully <-- \n');
-
-
-
-
+% % [P_val,h_val,s1_val] = EvaluateClassifier(valX, Wstar, bstar);
+% load 'etas';
+% load 'lambdas';
+% 
+% figure
+% x = [0:10];
+% subplot(1,2,1)
+% 
+% 
+% plot(x,lambda0_0000001,x,lambda0_000001,x,lambda0_00001,x,lambda0_0001,x,lambda0_001,x,lambda0_01,x,lambda0_1,x,lambda0,x,lambda1,'LineWidth', 1.5)
+% legend(['lambda = 1e-7'],...
+%     ['lambda = 1e-6'],...
+%     ['lambda = 1e-5'],...
+%     ['lambda = 1e-4'],...
+%     ['lambda = 1e-3'],...
+%     ['lambda = 1e-2'],...
+%     ['lambda = 1e-1'],...
+%     ['lambda = 0'],...
+%     ['lambda = 1e+0'])
+% title('Loss Function at different values of lambda (eta=0.0385)','FontSize',20)
+% axis([0 10 1 2.5])
+% 
+% subplot(1,2,2)
+% plot(x,eta0_01,x,eta0_015,x,eta0_03,x,eta0_0385,x,eta0_05,x,eta0_09,x,eta0_1,x,eta0_2,x,eta0,'LineWidth', 1.5)
+% legend(['eta = 0.01'],...
+%     ['eta = 0.015'],...
+%     ['eta = 0.03'],...
+%     ['eta = 0.0385'],...
+%     ['eta = 0.05'],...
+%     ['eta = 0.09'],...
+%     ['eta = 0.1'],...
+%     ['eta = 0.2'],...
+%     ['eta = 0'])
+% title('Loss Function at different values of eta (lambda=1e-6)','FontSize',20)
+% axis([0 10 1 2.5])
+% 
+% fprintf('--> Code ran successfully <-- \n');
+% 
+% 
+% 
+% 
